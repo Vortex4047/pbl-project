@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowRight, Calendar, Coffee, Car, ShoppingBag, Music, Film, ShoppingCart, Plane, Laptop, Shirt, PlusCircle, Lightbulb } from 'lucide-react';
 import { RadialScore } from './RadialScore';
@@ -11,8 +11,14 @@ type TimeRange = '7D' | '30D' | '3M';
 
 export const Dashboard: React.FC = () => {
   const { transactions, budgets, savingsGoals } = useFinance();
-  const { formatCurrency, getCurrencySymbol } = useCurrency();
+  const { currency, setCurrency, formatCurrency, getCurrencySymbol } = useCurrency();
   const [timeRange, setTimeRange] = useState<TimeRange>('30D');
+
+  useEffect(() => {
+    if (currency !== 'INR') {
+      setCurrency('INR');
+    }
+  }, [currency, setCurrency]);
 
   // Generate chart data based on time range with AI prediction
   const generateChartData = (range: TimeRange) => {

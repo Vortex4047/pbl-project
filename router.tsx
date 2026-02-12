@@ -29,12 +29,13 @@ const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType>)
   </Suspense>
 );
 
-export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <App />,
-        errorElement: <RouteError />,
-        children: [
+export const router = createBrowserRouter(
+    [
+        {
+            path: "/",
+            element: <App />,
+            errorElement: <RouteError />,
+            children: [
             {
                 index: true,
                 element: <Navigate to="/dashboard" replace />
@@ -96,5 +97,9 @@ export const router = createBrowserRouter([
                 element: <NotFound />
             }
         ]
+        }
+    ],
+    {
+        basename: import.meta.env.BASE_URL
     }
-]);
+);

@@ -70,7 +70,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onSignup }) => {
           {/* Logo */}
           <div className="flex flex-col items-center mb-6">
             <div className="bg-white/10 backdrop-blur-sm px-6 py-2 rounded-full border border-white/20 mb-6">
-              <p className="text-white/70 text-sm">Your logo</p>
+              <p className="text-white/70 text-sm">MOCK LOGIN</p>
             </div>
           </div>
 

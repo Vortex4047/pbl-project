@@ -10,6 +10,13 @@ import { ThemeProvider } from './context/ThemeContext';
 function App() {
   const [user, setUser] = useState<User | null>(() => {
     try {
+      const params = new URLSearchParams(window.location.search);
+      const forceLogin = params.get('login') === '1';
+      if (forceLogin) {
+        localStorage.removeItem('finance_user');
+        return null;
+      }
+
       const storedUser = localStorage.getItem('finance_user');
       if (!storedUser) {
         return null;

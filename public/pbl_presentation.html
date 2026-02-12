@@ -164,7 +164,13 @@
             }, 1000);
         }
 
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTimer);
+        } else {
+            initTimer();
+        }
         window.addEventListener('load', initTimer);
+        window.addEventListener('pageshow', initTimer);
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) initTimer();
         });

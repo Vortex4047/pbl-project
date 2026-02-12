@@ -4,92 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Finance Mentor AI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Space Grotesk', 'sans-serif'],
-            },
-            colors: {
-              primary: "#00b8c2",
-              secondary: "#8B00FF",
-              surface: "#27272A",
-              background: "#18181b",
-            },
-            animation: {
-              'float': 'float 20s ease-in-out infinite',
-              'float-delayed': 'float-delayed 25s ease-in-out infinite',
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            },
-            keyframes: {
-              float: {
-                '0%': { transform: 'translate(0, 0)' },
-                '50%': { transform: 'translate(50px, 30px)' },
-                '100%': { transform: 'translate(0, 0)' },
-              },
-              'float-delayed': {
-                '0%': { transform: 'translate(0, 0)' },
-                '50%': { transform: 'translate(-30px, 50px)' },
-                '100%': { transform: 'translate(0, 0)' },
-              }
-            }
-          },
-        },
-      }
-    </script>
-    <style>
-      body {
-        background-color: #18181b;
-        color: white;
-      }
-      .glass-panel {
-        background: rgba(39, 39, 42, 0.4);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      }
-      .neumorphic-card {
-        background: linear-gradient(145deg, #1e1e21, #232326);
-        box-shadow:  5px 5px 10px #121214, -5px -5px 10px #2a2a2e;
-        border: 1px solid rgba(255,255,255,0.03);
-      }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #18181b; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #3f3f46; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #52525b; 
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.36.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "recharts": "https://esm.sh/recharts@^3.6.0"
-  }
-}
-</script>
-</head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>

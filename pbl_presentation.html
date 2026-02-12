@@ -19,7 +19,7 @@
         .timer-stop { background-color: #991b1b !important; color: #ffffff !important; border: 3px solid #f87171 !important; animation: none; }
     </style>
 </head>
-<body onload="startTimer()">
+<body>
 
     <div id="timerContainer" class="fixed bottom-10 right-10 px-8 py-4 rounded-3xl flex items-center gap-4 transition-all">
         <i class="fas fa-hourglass-start text-blue-600 text-2xl" id="timerIcon"></i>
@@ -132,12 +132,25 @@
     <script>
         let sec = 0;
         let timer = null;
+        let timerStarted = false;
+
+        function updateTimerDisplay() {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            document.getElementById('displayTime').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function initTimer() {
+            if (timerStarted) return;
+            timerStarted = true;
+            startTimer();
+        }
+
         function startTimer() {
+            updateTimerDisplay();
             timer = setInterval(() => {
                 sec++;
-                let m = Math.floor(sec / 60);
-                let s = sec % 60;
-                document.getElementById('displayTime').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                updateTimerDisplay();
 
                 if (sec >= 480 && sec < 600) {
                     document.getElementById('timerContainer').classList.add('timer-warning');
@@ -150,6 +163,11 @@
                 }
             }, 1000);
         }
+
+        window.addEventListener('load', initTimer);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) initTimer();
+        });
 
         const ctx = document.getElementById('resultsChart').getContext('2d');
         new Chart(ctx, {

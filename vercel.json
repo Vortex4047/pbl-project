@@ -7,6 +7,15 @@
   ],
   "headers": [
     {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://vortex4047.github.io"
+        }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
       "headers": [
         {

@@ -7,6 +7,22 @@ export default defineConfig({
   server: {
     port: 3000,
     host: '0.0.0.0',
+    cors: {
+      origin: 'https://vortex4047.github.io',
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true
+    }
+  },
+  preview: {
+    port: 3000,
+    host: '0.0.0.0',
+    cors: {
+      origin: 'https://vortex4047.github.io',
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true
+    }
   },
   plugins: [react()],
   build: {

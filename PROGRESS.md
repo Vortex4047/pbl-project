@@ -15,6 +15,8 @@ graph TD
         D --> I[Data Persistence]
     end
 
+    I --> J
+
     subgraph Future_Plan [🚀 Future Plan]
         J[Backend Integration] --> K[Real Database]
         K --> L[User Authentication]

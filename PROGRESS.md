@@ -18,7 +18,7 @@ graph TD
     subgraph Future_Plan [🚀 Future Plan]
         J[Backend Integration] --> K[Real Database]
         K --> L[User Authentication]
-        L --> M[Mobile App Development]
+        L --> M[Web App Development]
         M --> N[Production Deployment]
         N --> O[Advanced Testing]
         O --> P[Accessibility Improvements]

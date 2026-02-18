@@ -18,10 +18,9 @@ graph TD
     I --> J
 
     subgraph Future_Plan [🚀 Future Plan]
-        J[Backend Integration] --> K[Real Database]
-        K --> L[User Authentication]
-        L --> M[Advanced Testing]
-        M --> N[Accessibility Improvements]
+        J[Performance Optimization] --> K[Advanced Testing]
+        K --> L[Accessibility Improvements]
+        L --> M[UI/UX Polish]
     end
 
     style Work_Done fill:#e1f5fe,stroke:#01579b,stroke-width:2px
@@ -57,17 +56,15 @@ graph TD
 
 ## 🚀 Future Plan
 
-### Backend Development
-- **API Server**: Develop a robust backend API (Node.js/Express or Python/Django).
-- **Database**: Migrate from LocalStorage to a real database (PostgreSQL/MongoDB).
-
-### Authentication & Security
-- **User Accounts**: Implement secure user authentication (Auth0/Firebase).
-- **Data Encryption**: Encrypt sensitive financial data.
+### Frontend Enhancements
+- **Performance Optimization**: Code splitting, lazy loading, and bundle size reduction.
+- **UI/UX Polish**: Refine animations, transitions, and responsive design for all screen sizes.
+- **Code Quality**: Refactor components for better reusability and maintainability.
 
 ### Quality Assurance
-- **Testing**: Add comprehensive unit and integration tests (Jest/Cypress).
-- **Performance**: Optimize bundle size and loading speed.
+- **Testing**: Add comprehensive unit and integration tests (Jest/React Testing Library).
+- **End-to-End Testing**: Implement Cypress or Playwright for critical user flows.
 
 ### Accessibility
-- **WCAG Compliance**: Ensure the app is accessible to all users (ARIA roles, keyboard navigation).
+- **WCAG Compliance**: Ensure the app is accessible to all users (ARIA roles, keyboard navigation, screen reader support).
+- **Color Contrast**: Verify and improve color contrast ratios for better readability.

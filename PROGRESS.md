@@ -18,10 +18,8 @@ graph TD
     subgraph Future_Plan [🚀 Future Plan]
         J[Backend Integration] --> K[Real Database]
         K --> L[User Authentication]
-        L --> M[Mobile App Development]
-        M --> N[Production Deployment]
-        N --> O[Advanced Testing]
-        O --> P[Accessibility Improvements]
+        L --> M[Advanced Testing]
+        M --> N[Accessibility Improvements]
     end
 
     style Work_Done fill:#e1f5fe,stroke:#01579b,stroke-width:2px
@@ -65,12 +63,7 @@ graph TD
 - **User Accounts**: Implement secure user authentication (Auth0/Firebase).
 - **Data Encryption**: Encrypt sensitive financial data.
 
-### Mobile Experience
-- **Mobile App**: Develop a dedicated mobile app using React Native.
-- **PWA**: Enhance Progressive Web App capabilities for better offline support.
-
-### DevOps & Quality Assurance
-- **CI/CD Pipeline**: Automate testing and deployment.
+### Quality Assurance
 - **Testing**: Add comprehensive unit and integration tests (Jest/Cypress).
 - **Performance**: Optimize bundle size and loading speed.
 

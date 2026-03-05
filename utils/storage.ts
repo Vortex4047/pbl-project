@@ -18,11 +18,3 @@ export const writeStorage = (key: string, value: unknown): void => {
     console.error(`Failed to write localStorage key "${key}":`, error);
   }
 };
-
-export const removeStorage = (key: string): void => {
-  try {
-    localStorage.removeItem(key);
-  } catch (error) {
-    console.error(`Failed to remove localStorage key "${key}":`, error);
-  }
-};

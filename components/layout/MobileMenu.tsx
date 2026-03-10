@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, LayoutDashboard, Wallet, PieChart, BarChart3, Repeat, CreditCard, TrendingUp, DollarSign } from 'lucide-react';
+import { Bot, LayoutDashboard, Wallet, BarChart3, CreditCard, TrendingUp } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface MobileMenuProps {

@@ -92,9 +92,9 @@ export const NotificationCenter: React.FC = () => {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-16 right-0 z-50 w-96 max-h-[600px] glass-panel-blue border-2 border-white/30 rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="fixed top-[64px] right-4 z-50 w-96 max-h-[600px] bg-gray-900 border border-white/20 rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.7)] overflow-hidden animate-scale-in">
             {/* Header */}
-            <div className="p-4 border-b border-white/20 bg-white/10 flex justify-between items-center">
+            <div className="p-4 border-b border-white/10 bg-gray-800 flex justify-between items-center">
               <div>
                 <h3 className="font-bold text-white">Notifications</h3>
                 <p className="text-xs text-gray-300">{unreadCount} unread</p>
@@ -128,8 +128,8 @@ export const NotificationCenter: React.FC = () => {
                 notifications.map((notif, index) => (
                   <div
                     key={notif.id}
-                    className={`p-4 border-b border-white/10 hover:bg-white/5 transition-all cursor-pointer group ${
-                      !notif.read ? 'bg-cyan-500/10' : ''
+                    className={`p-4 border-b border-white/10 transition-all cursor-pointer group ${
+                      !notif.read ? 'bg-cyan-950/80 hover:bg-cyan-900/60' : 'bg-gray-900 hover:bg-gray-800'
                     }`}
                     onClick={() => markAsRead(notif.id)}
                   >

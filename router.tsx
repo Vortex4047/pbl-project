@@ -22,6 +22,7 @@ const BillReminders = lazy(() => import('./components/BillReminders').then((m) =
 const TaxPlanner = lazy(() => import('./components/TaxPlanner').then((m) => ({ default: m.TaxPlanner })));
 const CreditScore = lazy(() => import('./components/CreditScore').then((m) => ({ default: m.CreditScore })));
 const EMICalculator = lazy(() => import('./components/EMICalculator').then((m) => ({ default: m.EMICalculator })));
+const CurrencyConverter = lazy(() => import('./components/CurrencyConverter').then((m) => ({ default: m.CurrencyConverter })));
 
 const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType>) => (
   <Suspense fallback={<RouteLoader />}>
@@ -91,6 +92,10 @@ export const router = createBrowserRouter(
             {
                 path: "/settings",
                 element: withSuspense(Settings)
+            },
+            {
+                path: "/currency-converter",
+                element: withSuspense(CurrencyConverter)
             },
             {
                 path: "*",

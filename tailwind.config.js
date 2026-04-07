@@ -9,13 +9,26 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Space Grotesk", "sans-serif"],
+        sans: ["Fira Sans", "sans-serif"],
+        mono: ["Fira Code", "monospace"],
       },
       colors: {
-        primary: "#00b8c2",
-        secondary: "#8B00FF",
-        surface: "#27272A",
-        background: "#18181b",
+        primary: "#F59E0B",
+        secondary: "#FBBF24",
+        cta: "#8B5CF6",
+        background: "#0F172A",
+        text: "#F8FAFC",
+        cyan: {
+          300: "#fcd34d",
+          400: "#fbbf24",
+          500: "#f59e0b",
+        },
+        blue: {
+          300: "#c4b5fd",
+          400: "#a78bfa",
+          500: "#8b5cf6",
+          600: "#7c3aed",
+        }
       },
       animation: {
         float: "float 12s ease-in-out infinite",

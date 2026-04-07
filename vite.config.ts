@@ -12,7 +12,15 @@ export default defineConfig({
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true
-    }
+    },
+    proxy: {
+      // Proxy Ollama API through Vite dev server to avoid CORS issues
+      '/ollama': {
+        target: 'http://localhost:11434',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ollama/, ''),
+      },
+    },
   },
   preview: {
     port: 3000,

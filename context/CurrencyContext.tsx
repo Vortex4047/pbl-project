@@ -1,12 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { readStorage, writeStorage } from '../utils/storage';
+import React, { createContext, useContext, ReactNode } from 'react';
 
-export type Currency = 'INR' | 'USD';
-export const SUPPORTED_CURRENCIES: Currency[] = ['INR', 'USD'];
+// Currency is fixed to INR — all financial data in this app is in Indian Rupees.
+// The Currency Converter tool handles conversions to other currencies separately.
+export type Currency = 'INR';
 
 interface CurrencyContextType {
   currency: Currency;
-  setCurrency: (currency: Currency) => void;
   formatCurrency: (amount: number, decimals?: number) => string;
   getCurrencySymbol: () => string;
 }
@@ -14,43 +13,21 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currency, setCurrencyState] = useState<Currency>(() => {
-    const saved = readStorage<unknown>('currency', 'INR');
-    return SUPPORTED_CURRENCIES.includes(saved as Currency) ? (saved as Currency) : 'INR';
-  });
+  const currency: Currency = 'INR';
 
-  useEffect(() => {
-    writeStorage('currency', currency);
-  }, [currency]);
+  const getCurrencySymbol = () => '₹';
 
-  const setCurrency = (newCurrency: Currency) => {
-    setCurrencyState(newCurrency);
-  };
-
-  const getCurrencySymbol = () => {
-    return currency === 'INR' ? '₹' : '$';
-  };
-
-  const formatCurrency = (amount: number, decimals: number = 0) => {
-    if (currency === 'INR') {
-      return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        maximumFractionDigits: decimals,
-        minimumFractionDigits: decimals
-      }).format(amount);
-    } else {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        maximumFractionDigits: decimals,
-        minimumFractionDigits: decimals
-      }).format(amount);
-    }
+  const formatCurrency = (amount: number, decimals: number = 0): string => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: decimals,
+      minimumFractionDigits: decimals,
+    }).format(amount);
   };
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, formatCurrency, getCurrencySymbol }}>
+    <CurrencyContext.Provider value={{ currency, formatCurrency, getCurrencySymbol }}>
       {children}
     </CurrencyContext.Provider>
   );

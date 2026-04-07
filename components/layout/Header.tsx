@@ -1,164 +1,277 @@
-import React, { useState } from 'react';
-import { Bot, LayoutDashboard, Wallet, PieChart, User, BarChart3, Repeat, CreditCard, TrendingUp, DollarSign, ChevronDown, Calculator, Award, FileText } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Bot, LayoutDashboard, Wallet, PieChart, BarChart3,
+  TrendingUp, CreditCard, DollarSign, Calculator, FileText,
+  Award, ArrowLeftRight, ChevronDown, User, Repeat,
+  Menu, X, Activity
+} from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { NotificationCenter } from '../NotificationCenter';
 
 interface HeaderProps {
-    onOpenChat: () => void;
+  onOpenChat: () => void;
 }
 
+interface NavItem {
+  to: string;
+  icon: React.ElementType;
+  label: string;
+}
+
+// Primary tabs — always visible
+const PRIMARY_LINKS: NavItem[] = [
+  { to: '/dashboard',   icon: LayoutDashboard, label: 'Dashboard'  },
+  { to: '/wallet',      icon: Wallet,          label: 'Wallet'     },
+  { to: '/analytics',   icon: BarChart3,       label: 'Analytics'  },
+  { to: '/planning',    icon: PieChart,        label: 'Planning'   },
+];
+
+// "Manage" dropdown group
+const MANAGE_LINKS: NavItem[] = [
+  { to: '/investments', icon: TrendingUp,    label: 'Investments' },
+  { to: '/debt',        icon: CreditCard,    label: 'Debt'        },
+  { to: '/bills',       icon: DollarSign,    label: 'Bills'       },
+  { to: '/recurring',   icon: Repeat,        label: 'Recurring'   },
+  { to: '/net-worth',   icon: Activity,      label: 'Net Worth'   },
+];
+
+// "Tools" dropdown group
+const TOOLS_LINKS: NavItem[] = [
+  { to: '/tax-planner',       icon: FileText,       label: 'Tax Planner'       },
+  { to: '/credit-score',      icon: Award,          label: 'Credit Score'      },
+  { to: '/emi-calculator',    icon: Calculator,     label: 'EMI Calculator'    },
+  { to: '/currency-converter',icon: ArrowLeftRight, label: 'Currency Converter'},
+];
+
+const ACTIVE_CLASS  = 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)] border-cyan-400/50';
+const DEFAULT_CLASS = 'text-gray-300 hover:text-white hover:bg-white/10 border-transparent';
+
+interface DropdownProps {
+  label: string;
+  icon: React.ElementType;
+  items: NavItem[];
+  isActive: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}
+
+const NavDropdown: React.FC<DropdownProps> = ({ label, icon: Icon, items, isActive, isOpen, onToggle, onClose }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [onClose]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={onToggle}
+        className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-full border transition-all ${isActive ? ACTIVE_CLASS : DEFAULT_CLASS}`}
+      >
+        <Icon size={15} />
+        <span>{label}</span>
+        <ChevronDown size={13} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 w-52 glass-panel-blue border border-white/20 rounded-2xl shadow-2xl z-50 overflow-hidden animate-scale-in">
+          {items.map(({ to, icon: ItemIcon, label: itemLabel }, idx) => (
+            <Link
+              key={to}
+              to={to}
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 transition-all text-sm text-white ${
+                idx === 0 ? 'pt-3' : ''
+              } ${idx === items.length - 1 ? 'pb-3' : ''}`}
+            >
+              <ItemIcon size={15} className="text-cyan-400 shrink-0" />
+              <span>{itemLabel}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const Header: React.FC<HeaderProps> = ({ onOpenChat }) => {
-    const location = useLocation();
-    const currentView = location.pathname;
-    const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const location = useLocation();
+  const currentView = location.pathname;
+  const [openDropdown, setOpenDropdown] = useState<'manage' | 'tools' | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    return (
-        <header className="sticky top-0 z-40 w-full glass-panel border-b border-white/10">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                <Link to="/dashboard" className="flex items-center gap-3 cursor-pointer group">
-                    <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-600/30 border border-white/20 group-hover:scale-105 transition-transform">
-                        <Bot className="text-cyan-300" size={24} />
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-white">Finance Mentor <span className="text-cyan-300">AI</span></h1>
-                </Link>
+  // Close dropdowns on route change
+  useEffect(() => {
+    setOpenDropdown(null);
+    setMobileMenuOpen(false);
+  }, [currentView]);
 
-                <nav className="hidden md:flex items-center gap-1 p-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-md">
-                    <Link
-                        to="/dashboard"
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${currentView === '/dashboard'
-                            ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                            : 'text-gray-200 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <LayoutDashboard size={16} />
-                        Dashboard
-                    </Link>
-                    <Link
-                        to="/wallet"
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${currentView === '/wallet'
-                            ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                            : 'text-gray-200 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <Wallet size={16} />
-                        Wallet
-                    </Link>
-                    <Link
-                        to="/planning"
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${currentView === '/planning'
-                            ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                            : 'text-gray-200 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <PieChart size={16} />
-                        Planning
-                    </Link>
-                    <Link
-                        to="/analytics"
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${currentView === '/analytics'
-                            ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                            : 'text-gray-200 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <BarChart3 size={16} />
-                        Analytics
-                    </Link>
-                    <Link
-                        to="/investments"
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${currentView === '/investments'
-                            ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                            : 'text-gray-200 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <TrendingUp size={16} />
-                        Invest
-                    </Link>
-                    <Link
-                        to="/debt"
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${currentView === '/debt'
-                            ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                            : 'text-gray-200 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <CreditCard size={16} />
-                        Debt
-                    </Link>
-                    <Link
-                        to="/bills"
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${currentView === '/bills'
-                            ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                            : 'text-gray-200 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <DollarSign size={16} />
-                        Bills
-                    </Link>
-                    
-                    {/* Tools Dropdown */}
-                    <div className="relative">
-                        <button
-                            onClick={() => setIsToolsOpen(!isToolsOpen)}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${
-                                ['/tax-planner', '/credit-score', '/emi-calculator'].includes(currentView)
-                                    ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                                    : 'text-gray-200 hover:text-white hover:bg-white/10'
-                            }`}
-                        >
-                            <Calculator size={16} />
-                            Tools
-                            <ChevronDown size={14} className={`transition-transform ${isToolsOpen ? 'rotate-180' : ''}`} />
-                        </button>
-                        
-                        {isToolsOpen && (
-                            <div className="absolute top-full right-0 mt-2 w-48 glass-panel-blue border border-white/20 rounded-xl shadow-2xl z-50 animate-scale-in">
-                                <Link
-                                    to="/tax-planner"
-                                    onClick={() => setIsToolsOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-all first:rounded-t-xl"
-                                >
-                                    <FileText size={16} className="text-cyan-400" />
-                                    <span className="text-sm text-white">Tax Planner</span>
-                                </Link>
-                                <Link
-                                    to="/credit-score"
-                                    onClick={() => setIsToolsOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-all"
-                                >
-                                    <Award size={16} className="text-cyan-400" />
-                                    <span className="text-sm text-white">Credit Score</span>
-                                </Link>
-                                <Link
-                                    to="/emi-calculator"
-                                    onClick={() => setIsToolsOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-all last:rounded-b-xl"
-                                >
-                                    <Calculator size={16} className="text-cyan-400" />
-                                    <span className="text-sm text-white">EMI Calculator</span>
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </nav>
+  const isManageActive = MANAGE_LINKS.some(l => l.to === currentView);
+  const isToolsActive  = TOOLS_LINKS.some(l => l.to === currentView);
 
-                <div className="flex items-center gap-4">
-                    {/* Mobile Chat Trigger */}
-                    <button
-                        onClick={onOpenChat}
-                        className="md:hidden p-2 text-cyan-300 hover:bg-white/10 rounded-full transition-colors"
-                    >
-                        <Bot size={24} />
-                    </button>
+  const toggle = (name: 'manage' | 'tools') =>
+    setOpenDropdown(prev => prev === name ? null : name);
 
-                    <NotificationCenter />
+  return (
+    <header className="sticky top-0 z-40 w-full glass-panel border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-4">
 
-                    <Link
-                        to="/settings"
-                        className={`w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-600/40 to-blue-600/40 border-2 overflow-hidden shadow-lg flex items-center justify-center transition-all ${currentView === '/settings' ? 'border-cyan-400 ring-2 ring-cyan-400/30' : 'border-white/30 hover:border-cyan-300'}`}
-                    >
-                        <User size={20} className="text-white" />
-                    </Link>
-                </div>
+        {/* Logo */}
+        <Link to="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
+          <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-600/30 border border-white/20 group-hover:scale-105 transition-transform">
+            <Bot className="text-cyan-300" size={22} />
+          </div>
+          <span className="text-lg font-bold tracking-tight text-white hidden sm:block">
+            Finance <span className="text-cyan-300">AI</span>
+          </span>
+        </Link>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-1 p-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+          {PRIMARY_LINKS.map(({ to, icon: Icon, label }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-full border transition-all ${
+                currentView === to ? ACTIVE_CLASS : DEFAULT_CLASS
+              }`}
+            >
+              <Icon size={15} />
+              {label}
+            </Link>
+          ))}
+
+          <div className="w-px h-5 bg-white/20 mx-1" />
+
+          <NavDropdown
+            label="Manage"
+            icon={TrendingUp}
+            items={MANAGE_LINKS}
+            isActive={isManageActive}
+            isOpen={openDropdown === 'manage'}
+            onToggle={() => toggle('manage')}
+            onClose={() => setOpenDropdown(null)}
+          />
+
+          <NavDropdown
+            label="Tools"
+            icon={Calculator}
+            items={TOOLS_LINKS}
+            isActive={isToolsActive}
+            isOpen={openDropdown === 'tools'}
+            onToggle={() => toggle('tools')}
+            onClose={() => setOpenDropdown(null)}
+          />
+        </nav>
+
+        {/* Right side */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* AI Chat button */}
+          <button
+            onClick={onOpenChat}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500/30 hover:to-blue-600/30 border border-cyan-400/30 text-cyan-300 text-sm font-medium transition-all hover:scale-105"
+            title="Open AI Mentor"
+          >
+            <Bot size={16} />
+            <span className="hidden lg:inline">AI Chat</span>
+          </button>
+
+          <NotificationCenter />
+
+          <Link
+            to="/settings"
+            className={`w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-600/40 to-blue-600/40 border-2 flex items-center justify-center transition-all ${
+              currentView === '/settings'
+                ? 'border-cyan-400 ring-2 ring-cyan-400/30'
+                : 'border-white/30 hover:border-cyan-300'
+            }`}
+          >
+            <User size={18} className="text-white" />
+          </Link>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileMenuOpen(p => !p)}
+            className="md:hidden p-2 rounded-full hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile slide-down menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-white/10 bg-gray-900/95 backdrop-blur-xl animate-slide-in-left">
+          <div className="px-4 py-3 space-y-1">
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold px-2 pb-1">Main</p>
+            {PRIMARY_LINKS.map(({ to, icon: Icon, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  currentView === to
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30'
+                    : 'text-gray-200 hover:bg-white/10'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon size={18} />
+                {label}
+              </Link>
+            ))}
+
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold px-2 pt-2 pb-1">Manage</p>
+            {MANAGE_LINKS.map(({ to, icon: Icon, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  currentView === to
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30'
+                    : 'text-gray-200 hover:bg-white/10'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon size={18} />
+                {label}
+              </Link>
+            ))}
+
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold px-2 pt-2 pb-1">Tools</p>
+            {TOOLS_LINKS.map(({ to, icon: Icon, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  currentView === to
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30'
+                    : 'text-gray-200 hover:bg-white/10'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon size={18} />
+                {label}
+              </Link>
+            ))}
+
+            <div className="pt-2 border-t border-white/10">
+              <button
+                onClick={() => { onOpenChat(); setMobileMenuOpen(false); }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-cyan-300 hover:bg-white/10 transition-all"
+              >
+                <Bot size={18} />
+                AI Chat
+              </button>
             </div>
-        </header>
-    );
+          </div>
+        </div>
+      )}
+    </header>
+  );
 };

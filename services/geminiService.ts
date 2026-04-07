@@ -6,7 +6,7 @@ interface FinancialContextData {
   savingsGoals: SavingsGoal[];
 }
 
-interface OpenRouterResponse {
+interface OllamaResponse {
   choices?: Array<{
     message?: {
       content?: string;
@@ -15,77 +15,98 @@ interface OpenRouterResponse {
   error?: {
     message?: string;
   };
+  // Fallback for native Ollama /api/generate format
+  response?: string;
 }
 
-export const sendMessageToMentor = async (userMessage: string, data: FinancialContextData): Promise<string> => {
-  try {
-    // Check if API key is configured
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-    if (!apiKey || apiKey === 'your_openrouter_api_key_here') {
-      return "🔑 **API Key Required**\n\nTo use the AI Finance Mentor, you need to set up your OpenRouter API key:\n\n1. Get a free API key from: https://openrouter.ai/keys\n2. Open `.env.local` in your project\n3. Replace `your_openrouter_api_key_here` with your actual API key\n4. Restart the dev server\n\nDon't worry - all other features work without an API key! ✨";
-    }
+// Base URL for Ollama — uses OpenAI-compatible endpoint
+const OLLAMA_BASE_URL = "http://localhost:11434/v1";
 
+/**
+ * Returns the list of locally available Ollama models.
+ * Falls back to a default list if the API is unreachable.
+ */
+export const fetchOllamaModels = async (): Promise<string[]> => {
+  try {
+    const res = await fetch("http://localhost:11434/api/tags");
+    if (!res.ok) return ["llama3.2:latest"];
+    const data = (await res.json()) as { models?: Array<{ name: string }> };
+    const models = (data.models ?? []).map((m) => m.name).filter(Boolean);
+    return models.length > 0 ? models : ["llama3.2:latest"];
+  } catch {
+    return ["llama3.2:latest"];
+  }
+};
+
+export const sendMessageToMentor = async (
+  userMessage: string,
+  data: FinancialContextData,
+  model: string = "llama3.2:latest"
+): Promise<string> => {
+  try {
     // Construct financial context
     const FINANCIAL_CONTEXT = `You are Finance Mentor AI, a helpful, friendly, and savvy financial assistant.
 Here is the user's current financial snapshot:
 
 Recent Transactions:
-${data.transactions.slice(0, 10).map(t => `${t.date}: ${t.merchant} ($${Math.abs(t.amount)}) - ${t.category}`).join('\n')}
+${data.transactions.slice(0, 10).map((t) => `${t.date}: ${t.merchant} ($${Math.abs(t.amount)}) - ${t.category}`).join("\n")}
 
 Active Budgets:
-${data.budgets.map(b => `${b.category}: $${b.spent} spent of $${b.limit} limit`).join('\n')}
+${data.budgets.map((b) => `${b.category}: $${b.spent} spent of $${b.limit} limit`).join("\n")}
 
 Savings Goals:
-${data.savingsGoals.map(g => `${g.name}: Saved $${g.current} of $${g.target}`).join('\n')}
+${data.savingsGoals.map((g) => `${g.name}: Saved $${g.current} of $${g.target}`).join("\n")}
 
 Answer the user's questions based on this data. Be concise, encouraging, and use emojis occasionally. 
 If the user asks about something not in the data, give general financial advice but mention you don't have that specific record.`;
 
-    // Call OpenRouter API
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
-    const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for local models
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch(`${OLLAMA_BASE_URL}/chat/completions`, {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': appUrl,
-        'X-Title': 'Finance Mentor AI'
+        "Content-Type": "application/json",
       },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-exp:free', // Free model
+        model,
         messages: [
-          { role: 'system', content: FINANCIAL_CONTEXT },
-          { role: 'user', content: userMessage }
-        ]
-      })
+          { role: "system", content: FINANCIAL_CONTEXT },
+          { role: "user", content: userMessage },
+        ],
+        stream: false,
+      }),
     }).finally(() => clearTimeout(timeoutId));
 
     if (!response.ok) {
-      const errorData = (await response.json().catch(() => ({}))) as OpenRouterResponse;
-      throw new Error(`API Error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+      const errorData = (await response.json().catch(() => ({}))) as OllamaResponse;
+      throw new Error(
+        `Ollama Error: ${response.status} - ${errorData.error?.message ?? response.statusText}`
+      );
     }
 
-    const result = (await response.json()) as OpenRouterResponse;
-    return result.choices?.[0]?.message?.content || "I'm having trouble analyzing that right now.";
-    
+    const result = (await response.json()) as OllamaResponse;
+    return (
+      result.choices?.[0]?.message?.content ??
+      "I'm having trouble analyzing that right now."
+    );
   } catch (error: unknown) {
-    console.error("OpenRouter API Error:", error);
-    const message = error instanceof Error ? error.message : '';
-    
-    // Check for specific API key errors
-    if (message.includes('API key') || message.includes('401') || message.includes('403')) {
-      return "🔑 **Invalid API Key**\n\nYour OpenRouter API key appears to be invalid. Please:\n\n1. Get a valid API key from: https://openrouter.ai/keys\n2. Update `.env.local` with your new key\n3. Restart the dev server\n\nAll other app features work fine! 💪";
+    console.error("Ollama API Error:", error);
+    const message = error instanceof Error ? error.message : "";
+
+    if (message.includes("aborted") || message.includes("timeout")) {
+      return "⏱️ **Request Timeout**\n\nThe local model took too long to respond. Try a smaller model like `llama3.2:latest` or make sure Ollama is running.";
     }
 
-    if (message.includes('aborted')) {
-      return "⏱️ **Request Timeout**\n\nThe AI service took too long to respond. Please try again.";
+    if (
+      message.includes("Failed to fetch") ||
+      message.includes("NetworkError") ||
+      message.includes("ECONNREFUSED")
+    ) {
+      return `🔌 **Ollama Not Running**\n\nCould not connect to Ollama at \`${OLLAMA_BASE_URL}\`.\n\nPlease make sure:\n1. Ollama is installed: https://ollama.ai\n2. Run \`ollama serve\` in your terminal\n3. Pull a model: \`ollama pull llama3.2\`\n\nThen refresh and try again! 🚀`;
     }
-    
-    // Network or other errors
-    return "⚠️ **Connection Issue**\n\nI'm having trouble connecting to the AI service. Please check your internet connection and try again.\n\nIn the meantime, you can still use all other app features! 🚀";
+
+    return "⚠️ **Something Went Wrong**\n\nUnexpected error while contacting Ollama. Check your terminal for details.";
   }
 };

@@ -1,43 +1,53 @@
 import React from 'react';
-import { Bot, LayoutDashboard, Wallet, BarChart3, CreditCard, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Wallet, BarChart3, TrendingUp, Bot, PieChart } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface MobileMenuProps {
-    onOpenChat: () => void;
+  onOpenChat: () => void;
 }
 
-export const MobileMenu: React.FC<MobileMenuProps> = ({ onOpenChat }) => {
-    const location = useLocation();
-    const currentView = location.pathname;
+const TABS = [
+  { to: '/dashboard',   icon: LayoutDashboard, label: 'Home'     },
+  { to: '/wallet',      icon: Wallet,          label: 'Wallet'   },
+  { to: '/analytics',   icon: BarChart3,       label: 'Analytics'},
+  { to: '/planning',    icon: PieChart,        label: 'Planning' },
+  { to: '/investments', icon: TrendingUp,      label: 'Invest'   },
+];
 
-    return (
-        <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden">
-            <div className="flex justify-around glass-panel border-t border-white/20 overflow-x-auto">
-                <Link to="/dashboard" className={`flex-1 flex flex-col items-center py-3 text-xs transition-colors min-w-[60px] ${currentView === '/dashboard' ? 'text-cyan-300' : 'text-gray-200 hover:text-white'}`}>
-                    <LayoutDashboard size={20} />
-                    <span className="mt-1">Home</span>
-                </Link>
-                <Link to="/wallet" className={`flex-1 flex flex-col items-center py-3 text-xs transition-colors min-w-[60px] ${currentView === '/wallet' ? 'text-cyan-300' : 'text-gray-200 hover:text-white'}`}>
-                    <Wallet size={20} />
-                    <span className="mt-1">Wallet</span>
-                </Link>
-                <Link to="/analytics" className={`flex-1 flex flex-col items-center py-3 text-xs transition-colors min-w-[60px] ${currentView === '/analytics' ? 'text-cyan-300' : 'text-gray-200 hover:text-white'}`}>
-                    <BarChart3 size={20} />
-                    <span className="mt-1">Stats</span>
-                </Link>
-                <Link to="/investments" className={`flex-1 flex flex-col items-center py-3 text-xs transition-colors min-w-[60px] ${currentView === '/investments' ? 'text-cyan-300' : 'text-gray-200 hover:text-white'}`}>
-                    <TrendingUp size={20} />
-                    <span className="mt-1">Invest</span>
-                </Link>
-                <Link to="/debt" className={`flex-1 flex flex-col items-center py-3 text-xs transition-colors min-w-[60px] ${currentView === '/debt' ? 'text-cyan-300' : 'text-gray-200 hover:text-white'}`}>
-                    <CreditCard size={20} />
-                    <span className="mt-1">Debt</span>
-                </Link>
-                <button onClick={onOpenChat} className="flex-1 flex flex-col items-center py-3 text-xs text-gray-200 hover:text-white transition-colors min-w-[60px]">
-                    <Bot size={20} />
-                    <span className="mt-1">Chat</span>
-                </button>
-            </div>
-        </div>
-    );
+export const MobileMenu: React.FC<MobileMenuProps> = ({ onOpenChat }) => {
+  const location = useLocation();
+  const currentView = location.pathname;
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden safe-area-bottom">
+      <div className="flex glass-panel border-t border-white/20">
+        {TABS.map(({ to, icon: Icon, label }) => {
+          const isActive = currentView === to;
+          return (
+            <Link
+              key={to}
+              to={to}
+              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[11px] font-medium transition-all ${
+                isActive ? 'text-cyan-300' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-cyan-500/20' : ''}`}>
+                <Icon size={19} />
+              </div>
+              <span>{label}</span>
+            </Link>
+          );
+        })}
+        <button
+          onClick={onOpenChat}
+          className="flex-1 flex flex-col items-center py-3 gap-0.5 text-[11px] font-medium text-gray-400 hover:text-cyan-300 transition-all"
+        >
+          <div className="p-1.5 rounded-xl">
+            <Bot size={19} />
+          </div>
+          <span>AI Chat</span>
+        </button>
+      </div>
+    </div>
+  );
 };

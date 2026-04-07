@@ -12,6 +12,7 @@ interface FinanceContextType {
   addBudget: (budget: Omit<Budget, 'id'>) => void;
   addSavingsGoal: (goal: Omit<SavingsGoal, 'id'>) => void;
   updateBudgetSpent: (category: string, amount: number) => void;
+  updateSavingsGoalProgress: (id: string, amount: number) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -82,6 +83,15 @@ export const FinanceProvider: React.FC<{ children: ReactNode }> = ({ children })
     }));
   };
 
+  const updateSavingsGoalProgress = (id: string, amount: number) => {
+    setSavingsGoals(prev => prev.map(g => {
+      if (g.id === id) {
+        return { ...g, current: Math.min(g.current + amount, g.target) };
+      }
+      return g;
+    }));
+  };
+
   return (
     <FinanceContext.Provider value={{ 
       transactions, 
@@ -90,7 +100,8 @@ export const FinanceProvider: React.FC<{ children: ReactNode }> = ({ children })
       addTransaction, 
       addBudget, 
       addSavingsGoal,
-      updateBudgetSpent 
+      updateBudgetSpent,
+      updateSavingsGoalProgress,
     }}>
       {children}
     </FinanceContext.Provider>

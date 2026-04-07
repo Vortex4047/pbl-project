@@ -3,7 +3,7 @@ import { User, Bell, Shield, Wallet, LogOut, ChevronRight, Globe, CreditCard, Tr
 import { User as UserType } from '../types';
 import { useOutletContext } from 'react-router-dom';
 import { DataExportImport } from './DataExportImport';
-import { Currency, SUPPORTED_CURRENCIES, useCurrency } from '../context/CurrencyContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useTheme } from '../context/ThemeContext';
 
 type OutletContextType = {
@@ -13,7 +13,7 @@ type OutletContextType = {
 
 export const Settings: React.FC = () => {
   const { user, onLogout } = useOutletContext<OutletContextType>();
-  const { currency, setCurrency } = useCurrency();
+  const { currency } = useCurrency();
   const { theme, setTheme, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState({
     budgetAlerts: true,
@@ -94,19 +94,11 @@ export const Settings: React.FC = () => {
                <div className="p-4 flex items-center justify-between group hover:bg-white/5 transition-all">
                   <div>
                     <p className="text-sm font-medium text-white group-hover:text-cyan-300 transition-colors">Currency</p>
-                    <p className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">Select your preferred display currency</p>
+                    <p className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">All amounts displayed in Indian Rupees</p>
                   </div>
-                  <select 
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value as Currency)}
-                    className="bg-white/10 border border-white/20 rounded-lg text-sm text-white px-3 py-1.5 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all cursor-pointer"
-                  >
-                    {SUPPORTED_CURRENCIES.map((curr) => (
-                      <option key={curr} value={curr}>
-                        {curr === 'INR' ? 'INR (₹)' : 'USD ($)'}
-                      </option>
-                    ))}
-                  </select>
+                  <span className="px-3 py-1.5 rounded-lg bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-sm font-bold">
+                    ₹ INR
+                  </span>
                </div>
                <div className="p-4 flex items-center justify-between gap-4 group hover:bg-white/5 transition-all">
                   <div>
